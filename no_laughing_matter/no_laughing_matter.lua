@@ -1,14 +1,14 @@
 --- STEAMODDED HEADER
 --- MOD_NAME: no laughing matter
 --- MOD_ID: no_laughing_matter
---- MOD_AUTHOR: [MiniRebel, modlitch]
---- MOD_DESCRIPTION: this a mod based on modlitch's joker idea's
+--- MOD_AUTHOR: [MiniRebel, Modlich_303]
+--- MOD_DESCRIPTION: this a mod based on Modlich_303's joker idea's
 --- DEPENDENCIES: [Steamodded>=1.0.0~ALPHA-0812d]
 
 ----------------------------------------------
 ------------MOD CODE -------------------------
--- thanks modlitch for the amazing joker art and idea's! <3
--- [insert modlitch's message]
+-- thanks Modlich_303 for the amazing joker art and idea's! <3
+-- [insert moditch's message]
 -- and my self for the functionality :D
 -- sorry for the code in advance! - mini
 
