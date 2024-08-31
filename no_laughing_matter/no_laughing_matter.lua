@@ -24,7 +24,7 @@ SMODS.Atlas {
 
 
 SMODS.Joker {
-  key = 'side',
+  key = 'squished',
   loc_txt = {
     name = 'Squished joker',
     text = {
