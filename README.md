@@ -9,6 +9,7 @@ So far there is only 9 Jokers (with few more ready for next update), but there i
 
 Gameplay:<br>
 ![image](https://github.com/user-attachments/assets/3f672c4f-186b-4132-adeb-8c0ba84e029b)
+![Balatro 01 09 2024 17_15_35](https://github.com/user-attachments/assets/fe3a7f02-dbb5-4052-a9de-6d23c3c121f8)
 
 And here you go, the list of what we have planned and ready (geen stamp means it's in the mod already, orange means it's ready for next update):<br>
 ![meanings](https://github.com/user-attachments/assets/dbefde69-044b-4b27-8168-48b1a7f8e5e5)
