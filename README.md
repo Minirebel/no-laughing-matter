@@ -13,6 +13,8 @@ Gameplay:<br>
 And here you go, the list of what we have planned and ready (geen stamp means it's in the mod already, orange means it's ready for next update):<br>
 ![meanings](https://github.com/user-attachments/assets/dbefde69-044b-4b27-8168-48b1a7f8e5e5)
 
+(To download, press the code button, download zip, and put the `no-laughing-matter-main` folder in your balatro mod folder)
+
 Creddits:<br>
 Art - Modlich_303 <br>
 Code - MiniRebel <br>
