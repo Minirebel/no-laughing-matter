@@ -4,7 +4,7 @@
 --- MOD_AUTHOR: [MiniRebel, Modlich_303]
 --- MOD_DESCRIPTION: this a mod based on Modlich_303's joker idea's
 --- DEPENDENCIES: [Steamodded>=1.0.0~ALPHA-0812d]
-
+--- PREFIX: mini
 ----------------------------------------------
 ------------MOD CODE -------------------------
 -- thanks Modlich_303 for the amazing joker art and idea's! <3
@@ -12,6 +12,13 @@
 -- and my self for the functionality :D
 -- sorry for the code in advance! - mini
 
+--mod tag icon
+SMODS.Atlas {
+  key = "modicon",
+  path = "NLM.png",
+  px = 32,
+  py = 32,
+}
 
 --meme
 
@@ -139,10 +146,10 @@ SMODS.Joker {
     loc_vars = function(self, info_queue, card)
       return { vars = { card.ability.extra.mult } }
     end,
-    rarity = 3,
+    rarity = 2,
     atlas = 'jokies',
     pos = { x = 3, y = 1 },
-    cost = 6,
+    cost = 5,
     calculate = function(self, card, context)
       if context.joker_main and not context.blueprint then
        return {
@@ -313,6 +320,59 @@ SMODS.Joker {
             end
        end
     }
+
+    SMODS.Joker {
+      key = 'chrome',
+      loc_txt = {
+        name = 'Monochrome',
+        text = {
+        'all cards act like',
+        '{C:money} wild cards{}',
+        'warning, there is no going back',
+        'you buy it, you keep it'
+        }
+      },
+      rarity = 3,
+      atlas = 'jokies',
+      pos = { x = 2, y = 2 },
+      cost = 6,
+      loc_vars = function(self, card, context)
+        function Card:is_suit(suit, bypass_debuff, flush_calc)
+          if flush_calc and next(SMODS.find_card('j_mini_chrome')) then
+              if (self.base.suit == 'Hearts' or self.base.suit == 'Diamonds' or self.base.suit == 'Clubs' or self.base.suit == 'Spades') == (suit == 'Hearts' or suit == 'Diamonds' or suit == 'Clubs' or suit == 'Spades') then
+                  return true
+              end
+              return self.base.suit == suit
+            end
+        end
+      end
+}
+
+SMODS.Joker {
+  key = 'earner',
+  loc_txt = {
+    name = 'Big Earner',
+    text = {
+      "Earn {C:money}$#1#{} at",
+      "end of round"
+    }
+  },
+  config = { extra = { money = 15 } },
+  rarity = 2,
+  atlas = 'jokies',
+  pos = { x = 0, y = 3 },
+  cost = 5,
+  loc_vars = function(self, info_queue, card)
+    return { vars = { card.ability.extra.money } }
+  end,
+  calc_dollar_bonus = function(self, card)
+    local bonus = card.ability.extra.money
+    if bonus > 0 then return bonus end
+  end
+}
+
+
+
 
 
 ----------------------------------------------
