@@ -321,32 +321,31 @@ SMODS.Joker {
        end
     }
 
+-- here to fix the flush joker because i hate seeing smeared effect disrespected
+--                      - SpaD_Overolls
+
     SMODS.Joker {
       key = 'chrome',
       loc_txt = {
         name = 'Monochrome',
         text = {
-        'all cards act like',
-        '{C:money} wild cards{}',
-        'warning, there is no going back',
-        'you buy it, you keep it'
+        'All cards are',
+        '{C:attention}one suit{}',
         }
       },
       rarity = 3,
       atlas = 'jokies',
       pos = { x = 2, y = 2 },
-      cost = 6,
-      loc_vars = function(self, card, context)
-        function Card:is_suit(suit, bypass_debuff, flush_calc)
-          if flush_calc and next(SMODS.find_card('j_mini_chrome')) then
-              if (self.base.suit == 'Hearts' or self.base.suit == 'Diamonds' or self.base.suit == 'Clubs' or self.base.suit == 'Spades') == (suit == 'Hearts' or suit == 'Diamonds' or suit == 'Clubs' or suit == 'Spades') then
-                  return true
-              end
-              return self.base.suit == suit
-            end
-        end
-      end
+      cost = 6
 }
+
+local is_suitRef = Card.is_suit
+function Card:is_suit(suit, bypass_debuff, flush_calc)
+    if SMODS.find_card('j_mini_chrome')[1] and (bypass_debuff or not self.debuff) then
+       return true
+    end
+    return is_suitRef(self, suit, bypass_debuff, flush_calc)
+end
 
 SMODS.Joker {
   key = 'earner',
