@@ -12,7 +12,7 @@ Gameplay:<br>
 ![Balatro 01 09 2024 17_15_35](https://github.com/user-attachments/assets/fe3a7f02-dbb5-4052-a9de-6d23c3c121f8)
 
 And here you go, the list of what we have planned and ready (geen stamp means it's in the mod already, orange means it's ready for next update):<br>
-![meanings](https://github.com/user-attachments/assets/b88e018a-68ca-44ff-b226-a2d5da17f18e)
+![meanings](https://github.com/user-attachments/assets/41bf34b8-425b-4fa1-b2a9-0a7da93d47f2)
 
 (To download, press the code button, download zip, and put the `no-laughing-matter-main` folder in your balatro mod folder)
 
