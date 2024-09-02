@@ -3,7 +3,7 @@ No Laughing Matter (NLM) adds whatever we think fits. No rules on what it is.
 ![image](https://github.com/user-attachments/assets/4e308eb5-4456-48e1-aad9-2c5bfb5c15b1)
 
 It is a WIP, so there isnt much yet, but we work to add more and more as fast as we can.<br>
-So far there is only 9 Jokers (with few more ready for next update), but there is already 32 planned, and the number is ever growing. Plans also incloude 2 new consumable card packs, and who knows if we come up with other new stuff
+So far there is only 11 Jokers (with few more ready for next update), but there is already 34 planned, and the number is ever growing. Plans also incloude 2 new consumable card packs, and who knows if we come up with other new stuff
 
 ![image](https://github.com/user-attachments/assets/c5e3ade5-071e-4235-b2d6-9a8e7edd8337)
 
@@ -12,7 +12,7 @@ Gameplay:<br>
 ![Balatro 01 09 2024 17_15_35](https://github.com/user-attachments/assets/fe3a7f02-dbb5-4052-a9de-6d23c3c121f8)
 
 And here you go, the list of what we have planned and ready (geen stamp means it's in the mod already, orange means it's ready for next update):<br>
-![meanings](https://github.com/user-attachments/assets/cf9b9d5b-f398-411a-ad31-6b457ed70854)
+![meanings](https://github.com/user-attachments/assets/85aa849c-588d-4ce7-a38c-8e76858aeddf)
 
 (To download, press the code button, download zip, and put the `no-laughing-matter-main` folder in your balatro mod folder)
 
