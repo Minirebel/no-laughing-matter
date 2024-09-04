@@ -389,7 +389,7 @@ SMODS.Joker {
 } },
   rarity = 2,
   atlas = 'jokies',
-  pos = { x = 0, y = 3 },
+  pos = { x = 6, y = 4 },
   cost = 5,
   loc_vars = function(self, info_queue, card)
     return { vars = { card.ability.extra.money } }
@@ -410,15 +410,15 @@ SMODS.Joker {
     name = 'Power of NEO',
     text = {
       "Earn {C:money}${}{X:money}2X{} at",
-      "end of round"
+      "start of round"
     }
   },
   config = { extra = { } },
   rarity = 4,
   atlas = 'jokies',
-  pos = { x = 0, y = 4 },
+  pos = { x = 2, y = 6 },
+  soul_pos = { x = 3, y = 6 },
   cost = 5,
-  soul_pos = { x = 4, y = 1 },
   calculate = function(self, card, context)
     if context.setting_blind then
 local mod = math.floor((G.GAME.dollars + (G.GAME.dollar_buffer or 0)) * (1))
@@ -438,7 +438,7 @@ SMODS.Joker {
   },
   rarity = 1,
   atlas = 'jokies',
-  pos = { x = 4, y = 2 },
+  pos = { x = 5, y = 5 },
   cost = 4,
   calculate = function(self, card, context)
     if context.skip_blind and not context.blueprint then
