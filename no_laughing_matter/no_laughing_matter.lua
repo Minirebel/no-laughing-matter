@@ -280,7 +280,7 @@ SMODS.Joker {
                           G.GAME.consumeable_buffer = 0
                           return true
                       end}))   
-                      card_eval_status_text(context.blueprint_card or self, 'extra', nil, nil, nil, {message = localize('k_plus_planet'), colour = G.C.PURPLE})                       
+                      card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = localize('k_plus_planet'), colour = G.C.PURPLE})                       
                   return true
               end)}))
             end
@@ -314,7 +314,7 @@ SMODS.Joker {
                           G.GAME.consumeable_buffer = 0
                           return true
                       end}))   
-                      card_eval_status_text(context.blueprint_card or self, 'extra', nil, nil, nil, {message = localize('k_plus_spectral'), colour = G.C.PURPLE})                       
+                      card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = localize('k_plus_spectral'), colour = G.C.PURPLE})                       
                   return true
               end)}))
             end
@@ -323,7 +323,6 @@ SMODS.Joker {
 
 -- here to fix the flush joker because i hate seeing smeared effect disrespected
 --                      - SpaD_Overolls
-
     SMODS.Joker {
       key = 'chrome',
       loc_txt = {
@@ -346,6 +345,8 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
     end
     return is_suitRef(self, suit, bypass_debuff, flush_calc)
 end
+--thanks SpaD_Overolls
+--   -minirebel
 
 SMODS.Joker {
   key = 'earner',
@@ -370,9 +371,85 @@ SMODS.Joker {
   end
 }
 
+-- just added
 
+SMODS.Joker {
+  key = 'spam',
+  loc_txt = {
+    name = 'Spamton',
+    text = {
+      "Earn {C:money}$random{} at",
+      "end of round"
+    }
+  },
+  config = { extra = { 
+    money_min = 1,
+    money_max = 10,
+    odds = 10
+} },
+  rarity = 2,
+  atlas = 'jokies',
+  pos = { x = 0, y = 3 },
+  cost = 5,
+  loc_vars = function(self, info_queue, card)
+    return { vars = { card.ability.extra.money } }
+  end,
+  calc_dollar_bonus = function(self, card)
+    local money_min = card.ability.extra.money_min
+    local money_max = card.ability.extra.money_max
+    card.ability.extra.money = math.random(money_min, money_max)
+    
+    local bonus = card.ability.extra.money
+    if bonus > 0 then return bonus end
+  end
+}
 
+SMODS.Joker {
+  key = 'neo',
+  loc_txt = {
+    name = 'Power of NEO',
+    text = {
+      "Earn {C:money}${}{X:money}2X{} at",
+      "end of round"
+    }
+  },
+  config = { extra = { } },
+  rarity = 4,
+  atlas = 'jokies',
+  pos = { x = 0, y = 4 },
+  cost = 5,
+  soul_pos = { x = 4, y = 1 },
+  calculate = function(self, card, context)
+    if context.setting_blind then
+local mod = math.floor((G.GAME.dollars + (G.GAME.dollar_buffer or 0)) * (1))
+        ease_dollars(mod)
+  end
+end
+}
 
+SMODS.Joker {
+  key = 'scout',
+  loc_txt = {
+    name = 'Scout',
+    text = {
+      "gives a {C:money}double tag{}",
+      "when blind is skipped"
+    }
+  },
+  rarity = 1,
+  atlas = 'jokies',
+  pos = { x = 4, y = 2 },
+  cost = 4,
+  calculate = function(self, card, context)
+    if context.skip_blind and not context.blueprint then
+           G.E_MANAGER:add_event(Event({func = (function()
+          add_tag(Tag('tag_double'))
+          play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
+          return true
+        end)}))
+      end
+    end
+}
 
 ----------------------------------------------
 ------------MOD CODE END----------------------
