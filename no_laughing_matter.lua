@@ -46,8 +46,9 @@ SMODS.Joker {
   atlas = 'side',
   pos = { x = 0, y = 0 },
   cost = 2,
-calculate = function(self, card, context)
-if context.joker_main then
+  blueprint_compat = true,
+  calculate = function(self, card, context)
+  if context.joker_main then
       return {
         mult_mod = card.ability.extra.mult,
         message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
@@ -79,6 +80,7 @@ SMODS.Joker {
   atlas = 'jokies',
   pos = { x = 5, y = 5 },
   cost = 4,
+  blueprint_compat = true,
   calculate = function(self, card, context)
     if context.skip_blind and not context.blueprint then
            G.E_MANAGER:add_event(Event({func = (function()
@@ -105,11 +107,12 @@ SMODS.Joker {
   atlas = 'jokies',
   pos = { x = 6, y = 3 },
   cost = 4,
+  blueprint_compat = true,
   loc_vars = function(self, info_queue, card)
     return { vars = { card.ability.extra.chips, card.ability.extra.mult } }
   end,
   calculate = function(self, card, context)
-    if context.individual and context.cardarea == G.play and not context.blueprint then
+    if context.individual and context.cardarea == G.play then
       if context.other_card:get_id() == 2 then
         return {
           chips = card.ability.extra.chips,
@@ -136,11 +139,12 @@ SMODS.Joker {
   atlas = 'jokies',
   pos = { x = 4, y = 4 },
   cost = 4,
+  blueprint_compat = true,
   loc_vars = function(self, info_queue, card)
     return { vars = { card.ability.extra.chips, card.ability.extra.mult } }
   end,
   calculate = function(self, card, context)
-    if context.individual and context.cardarea == G.play and not context.blueprint then
+    if context.individual and context.cardarea == G.play then
       if context.other_card:get_id() == 6 or context.other_card:get_id() == 9 then
         return {
           chips = card.ability.extra.chips,
@@ -167,11 +171,12 @@ SMODS.Joker {
     atlas = 'jokies',
     pos = { x = 4, y = 2 },
     cost = 4,
+    blueprint_compat = true,
     loc_vars = function(self, info_queue, card)
       return { vars = { card.ability.extra.chips, card.ability.extra.mult } }
     end,
     calculate = function(self, card, context)
-      if context.individual and context.cardarea == G.play and not context.blueprint then
+      if context.individual and context.cardarea == G.play then
         if context.other_card:is_face() then
           return {
             chips = card.ability.extra.chips,
@@ -198,6 +203,7 @@ SMODS.Joker {
     atlas = 'jokies',
     pos = { x = 6, y = 1 },
     cost = 5,
+    blueprint_compat = false,
     loc_vars = function(self, info_queue, card)
       return { vars = { card.ability.extra.hand_size } }
     end,
@@ -206,7 +212,7 @@ SMODS.Joker {
         card.ability.extra.hand_size = math.random(-3, 10)
         G.hand:change_size(card.ability.extra.hand_size) 
       end
-      if context.end_of_round then
+      if context.end_of_round or context.selling_car or card.getting_sliced then
         card.ability.extra.hand_size = 0
         G.hand:change_size(card.ability.extra.hand_size)
       end
@@ -230,8 +236,9 @@ SMODS.Joker {
     atlas = 'jokies',
     pos = { x = 3, y = 1 },
     cost = 5,
+    blueprint_compat = true,
     calculate = function(self, card, context)
-      if context.joker_main and not context.blueprint then
+      if context.joker_main then
        return {
           mult_mod = card.ability.extra.mult,
            message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
@@ -255,6 +262,7 @@ SMODS.Joker {
       atlas = 'jokies',
       pos = { x = 2, y = 0 },
       cost = 5,
+      blueprint_compat = true,
       calculate = function(self, card, context)
         if context.setting_blind and not card.getting_sliced and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
           G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
@@ -289,13 +297,16 @@ SMODS.Joker {
       atlas = 'jokies',
       pos = { x = 0, y = 3 },
       cost = 5,
+      blueprint_compat = false,
       loc_vars = function(self, info_queue, card)
         return { vars = { card.ability.extra.money } }
       end,
       calc_dollar_bonus = function(self, card)
+        if not context.blueprint then
         local bonus = card.ability.extra.money
         if bonus > 0 then return bonus end
       end
+    end
     }
     
     -- just added
@@ -319,6 +330,7 @@ SMODS.Joker {
       pos = { x = 6, y = 4 },
       soul_pos = { x = 6, y = 5 },
       cost = 5,
+      blueprint_compat = true,
       loc_vars = function(self, info_queue, card)
         return { vars = { card.ability.extra.money } }
       end,
@@ -329,7 +341,7 @@ SMODS.Joker {
         
         local bonus = card.ability.extra.money
         if bonus > 0 then return bonus end
-      end
+    end
     }
     
 
@@ -355,8 +367,9 @@ SMODS.Joker {
       atlas = 'jokies',
       pos = { x = 1, y = 2 },
       cost = 6,
+      blueprint_compat = true,
       calculate = function(self, card, context)
-          if context.joker_main and not context.blueprint then
+          if context.joker_main then
               local Xmult_min = card.ability.extra.Xmult_min
               local Xmult_max = card.ability.extra.Xmult_max
               card.ability.extra.Xmult = math.random(Xmult_min, Xmult_max)
@@ -387,6 +400,7 @@ SMODS.Joker {
       atlas = 'jokies',
       pos = { x = 5, y = 3 },
       cost = 6,
+      blueprint_compat = true,
       calculate = function(self, card, context)
         if context.setting_blind and not card.getting_sliced and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
           G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
@@ -421,7 +435,9 @@ SMODS.Joker {
       rarity = 3,
       atlas = 'jokies',
       pos = { x = 2, y = 2 },
-      cost = 6
+      cost = 6,
+      blueprint_compat = false,
+      --no code ainst blueprint cuz if all suit is the same then blueprint won't change anything
 }
 
 local is_suitRef = Card.is_suit
@@ -440,8 +456,8 @@ SMODS.Joker {
   loc_txt = {
     name = 'Power of NEO',
     text = {
-      "Earn {C:money}${}{X:money}2X{} at",
-      "start of round"
+      "earn {X:money}X2{} after",
+      "defeating a blind"
     }
   },
   config = { extra = { } },
@@ -450,8 +466,9 @@ SMODS.Joker {
   pos = { x = 2, y = 6 },
   soul_pos = { x = 3, y = 6 },
   cost = 5,
+  blueprint_compat = false,
   calculate = function(self, card, context)
-    if context.setting_blind then
+    if G.GAME.round_resets.blind_states == 'Defeated' and not context.blueprint then
 local mod = math.floor((G.GAME.dollars + (G.GAME.dollar_buffer or 0)) * (1))
         ease_dollars(mod)
   end
