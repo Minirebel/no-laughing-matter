@@ -51,14 +51,14 @@ SMODS.Joker {
   if context.joker_main then
       return {
         mult_mod = card.ability.extra.mult,
-        message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
-        }
+        message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } },
+          }
     end
   end
 }
 
 --for real
-
+--no calculation so no shake i think
 SMODS.Atlas {
   key = 'jokies',
   path = 'jokies.png',
@@ -88,6 +88,9 @@ SMODS.Joker {
           play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
           return true
         end)}))
+        return{
+          card:juice_up(),
+        }
       end
     end
 }
@@ -98,11 +101,11 @@ SMODS.Joker {
     name = 'Dunce',
     text = {
       "Each plajed {C:attention}2{}",
-      "gifes {C:chips}+#1#{} ships and",
-      "{C:mult}+#2#{} Mult when skored"
+      "gifes {C:chips}+#2#{} ships and",
+      "{C:mult}+#1#{} Mult when skored"
     }
   },
-  config = { extra = { chips = 19, mult = 3 } },
+  config = { extra = { mult = 3, chips = 19 } },
   rarity = 1,
   atlas = 'jokies',
   pos = { x = 6, y = 3 },
@@ -114,14 +117,14 @@ SMODS.Joker {
   calculate = function(self, card, context)
     if context.individual and context.cardarea == G.play then
       if context.other_card:get_id() == 2 then
-        return {
-          chips = card.ability.extra.chips,
-          mult = card.ability.extra.mult,
-          card = context.other_card
-        }
+          return {
+              chips = card.ability.extra.chips,
+              mult = card.ability.extra.mult,
+              card = card
+          }
+        end
       end
     end
-  end
 }
 
 SMODS.Joker {
@@ -130,8 +133,8 @@ SMODS.Joker {
     name = 'Class Clown',
     text = {
       "Each played {C:attention}6 {}&{C:attention} 9{}",
-      "gives {C:mult}+#2#{} mult and",
-      "{C:chips}+#1#{} chips when scored"
+      "gives {C:mult}+#1#{} mult and",
+      "{C:chips}+#2#{} chips when scored"
     }
   },
   config = { extra = { mult = 4, chips = 20 } },
@@ -146,12 +149,12 @@ SMODS.Joker {
   calculate = function(self, card, context)
     if context.individual and context.cardarea == G.play then
       if context.other_card:get_id() == 6 or context.other_card:get_id() == 9 then
-        return {
-          chips = card.ability.extra.chips,
-          mult = card.ability.extra.mult,
-          card = context.other_card
-        }
-      end
+          return {
+              chips = card.ability.extra.chips,
+              mult = card.ability.extra.mult,
+              card = card
+          }
+        end
     end
   end
 }
@@ -178,14 +181,15 @@ SMODS.Joker {
     calculate = function(self, card, context)
       if context.individual and context.cardarea == G.play then
         if context.other_card:is_face() then
-          return {
-            chips = card.ability.extra.chips,
-            mult = card.ability.extra.mult,
-            card = context.other_card
-          }
+            return {
+                chips = card.ability.extra.chips,
+                mult = card.ability.extra.mult,
+                card = card
+            }
+        end
         end
       end
-    end
+
   }
 
   
@@ -208,15 +212,19 @@ SMODS.Joker {
       return { vars = { card.ability.extra.hand_size } }
     end,
     calculate = function(self, card, context)
-      if context.setting_blind and not card.getting_sliced and not context.blueprint then
-        card.ability.extra.hand_size = math.random(-3, 10)
-        G.hand:change_size(card.ability.extra.hand_size) 
-      end
       if context.end_of_round or context.selling_car or card.getting_sliced then
         card.ability.extra.hand_size = 0
         G.hand:change_size(card.ability.extra.hand_size)
+      
+      if context.setting_blind and not card.getting_sliced and not context.blueprint then
+        card.ability.extra.hand_size = math.random(-3, 10)
+        G.hand:change_size(card.ability.extra.hand_size) 
+        return{
+          card = card
+        }
       end
-  end,
+  end
+end
 }
 
 SMODS.Joker {
@@ -241,7 +249,8 @@ SMODS.Joker {
       if context.joker_main then
        return {
           mult_mod = card.ability.extra.mult,
-           message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
+           message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } },
+           card = card
           }
       end
     end
@@ -279,6 +288,9 @@ SMODS.Joker {
                       card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = localize('k_plus_planet'), colour = G.C.PURPLE})                       
                   return true
               end)}))
+              return {
+                card = card
+              }
             end
        end
     }
@@ -302,14 +314,10 @@ SMODS.Joker {
         return { vars = { card.ability.extra.money } }
       end,
       calc_dollar_bonus = function(self, card)
-        if not context.blueprint then
         local bonus = card.ability.extra.money
         if bonus > 0 then return bonus end
       end
-    end
     }
-    
-    -- just added
     
     SMODS.Joker {
       key = 'spam',
@@ -344,7 +352,6 @@ SMODS.Joker {
     end
     }
     
-
     SMODS.Joker {
       key = 'lobo',
       loc_txt = {
@@ -368,7 +375,7 @@ SMODS.Joker {
       pos = { x = 1, y = 2 },
       cost = 6,
       blueprint_compat = true,
-      calculate = function(self, card, context)
+      calculate = function(self, card, context) 
           if context.joker_main then
               local Xmult_min = card.ability.extra.Xmult_min
               local Xmult_max = card.ability.extra.Xmult_max
@@ -379,7 +386,8 @@ SMODS.Joker {
                   message = localize {
                       type = 'variable',
                       key = 'a_xmult',
-                      vars = { card.ability.extra.Xmult }
+                      vars = { card.ability.extra.Xmult },
+                      card:juice_up()
                   }
               }
           end
@@ -417,6 +425,11 @@ SMODS.Joker {
                       card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = localize('k_plus_spectral'), colour = G.C.PURPLE})                       
                   return true
               end)}))
+              return {
+              card:juice_up(),
+              message = 'zzzzz!',
+              colour = G.C.GREY,
+              }
             end
        end
     }
@@ -437,6 +450,15 @@ SMODS.Joker {
       pos = { x = 2, y = 2 },
       cost = 6,
       blueprint_compat = false,
+      calculate = function(self, card, context)
+      if context.setting_blind then
+        return{
+          message = 'go wild!',
+          colour = G.C.GREY,
+          card:juice_up()
+        }
+      end
+      end
       --no code ainst blueprint cuz if all suit is the same then blueprint won't change anything
 }
 
@@ -471,11 +493,56 @@ SMODS.Joker {
     if G.GAME.round_resets.blind_states == 'Defeated' and not context.blueprint then
 local mod = math.floor((G.GAME.dollars + (G.GAME.dollar_buffer or 0)) * (1))
         ease_dollars(mod)
-  end
+  return {
+    card:juice_up(),
+    message = 'big shot!',
+    colour = G.C.MULT,
+  }
+end
 end
 }
 
 
-
+--thanks Xxjimbolover420xX <3
+SMODS.Joker {
+  key = 'silly',
+  loc_txt = {
+    name = 'the silly',
+    text = {
+      "when on last hand",
+      "a random played card",
+      "gets destroyed and",
+      "gain {X:mult}X0.1{}",
+      "{C:inactive}(Currently {C:mult}X#1#{C:inactive} XMult)"
+    }
+  },
+  config = { extra = { Xmult = 1, Xmult_gain = 0.1 } },
+  rarity = 3,
+  atlas = 'jokies',
+  pos = { x = 5, y = 2 },
+  cost = 5,
+  blueprint_compat = false,
+  loc_vars = function(self, info_queue, card)
+    return { vars = { card.ability.extra.Xmult, card.ability.extra.Xmult_gain } }
+  end,
+  calculate = function(self, card, context)
+    if context.before and context.cardarea == G.jokers and G.GAME.current_round.hands_left == 0 and not context.blueprint then
+        pseudorandom_element(context.full_hand, pseudoseed('random_destroyIDFK')):start_dissolve()
+        card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+        return {
+          card:juice_up(),
+          message = 'Upgraded!',
+          colour = G.C.RED,
+        }
+    end
+    if context.joker_main and not context.blueprint then
+        return {
+          card:juice_up(),
+          Xmult_mod = card.ability.extra.Xmult,
+          message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } },
+        }
+    end
+end,
+}
 ----------------------------------------------
 ------------MOD CODE END----------------------
