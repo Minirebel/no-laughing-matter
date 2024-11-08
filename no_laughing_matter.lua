@@ -11,16 +11,7 @@
 -- [insert moditch's message]
 -- and my self for the functionality :D
 -- sorry for the code in advance! - mini
-
-
-
---G.last_tarrot
-
-
-
-
-
-
+--possible use: G.last_tarrot
 
 --mod tag icon
 SMODS.Atlas {
@@ -31,7 +22,6 @@ SMODS.Atlas {
 }
 
 --meme
-
 SMODS.Atlas {
   key = "side",
   path = "sideways.png",
@@ -72,7 +62,6 @@ SMODS.Joker {
 }
 
 --for real
---no calculation so no shake i think
 SMODS.Atlas {
   key = 'jokies',
   path = 'jokies.png',
@@ -705,7 +694,7 @@ SMODS.Joker {
     end
 end
 }
-
+--]]
 
 SMODS.Joker {
   key = 'geode',
@@ -720,7 +709,7 @@ SMODS.Joker {
   config = { extra = {chips = 5}},
   rarity = 3,
   atlas = 'jokies',
-  pos = { x = 4, y = 5 },
+  pos = { x = 1, y = 5 },
   cost = 5,
   blueprint_compat = true,
   loc_vars = function(self, info_queue, card)
@@ -737,7 +726,7 @@ SMODS.Joker {
     end
   end
 }
---]]
+
 
 --legendary needs 2x Xchips!
 SMODS.Joker {
