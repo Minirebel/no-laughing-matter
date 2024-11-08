@@ -63,8 +63,8 @@ SMODS.Joker {
 
 --for real
 SMODS.Atlas {
-  key = 'jokies',
-  path = 'jokies.png',
+  key = 'NLM_jokies',
+  path = 'NLM_jokies.png',
   px = 71,
   py = 95
 }
@@ -572,7 +572,7 @@ SMODS.Joker {
   loc_txt = {
     name = 'the silly',
     text = {
-      "when on last hand",
+      "when on last discard",
       "a random played card",
       "gets destroyed and",
       "gain {X:mult}X0.1{}",
@@ -596,7 +596,7 @@ SMODS.Joker {
         message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } },
       }
   end -- needs to kill smth out of the deck on winning hand
-    if context.before and context.cardarea == G.jokers and G.GAME.current_round.hands_left == 0 and not context.blueprint then
+    if context.before and context.cardarea == G.jokers and G.GAME.current_round.discards_left == 0 and not context.blueprint then
         pseudorandom_element(context.full_hand, pseudoseed('random_destroyIDFK')):start_dissolve()
         card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
         return {
@@ -699,14 +699,13 @@ end
 SMODS.Joker {
   key = 'geode',
   loc_txt = {
-    name = 'geode',
+    name = 'crystal geode',
     text = {
-      "{C:money}stone cards{} retrigger as",
-      "as many times as the {C:money}amount of{}",
-      "{C:money}stone cards{} in played hand"
+      "played {C:money}stone cards{} give",
+      "{C:mult}+#1#{} mult when scored"
     }
   },
-  config = { extra = {chips = 5}},
+  config = { extra = {mult = 5}},
   rarity = 3,
   atlas = 'jokies',
   pos = { x = 1, y = 5 },
@@ -719,7 +718,7 @@ SMODS.Joker {
     if context.individual and context.cardarea == G.play then
       if context.other_card.ability.name == "Stone Card" then
           return {
-              chips = card.ability.extra.chips,
+              chips = card.ability.extra.mult,
               card = card
           }
         end
