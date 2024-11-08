@@ -63,8 +63,8 @@ SMODS.Joker {
 
 --for real
 SMODS.Atlas {
-  key = 'NLM_jokies',
-  path = 'NLM_jokies.png',
+  key = 'jokies',
+  path = 'jokies.png',
   px = 71,
   py = 95
 }
