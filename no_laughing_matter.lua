@@ -703,7 +703,7 @@ SMODS.Joker {
     name = 'Crystal Geode',
     text = {
       "played {C:money}stone cards{} give",
-      "{C:mult}+#1# {} Mult when scored"
+      "{C:mult}+#1#{} Mult when scored"
     }
   },
   config = { extra = {mult = 5}},
