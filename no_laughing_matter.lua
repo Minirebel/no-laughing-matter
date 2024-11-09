@@ -703,7 +703,7 @@ SMODS.Joker {
     name = 'Crystal Geode',
     text = {
       "played {C:money}stone cards{} give",
-      "{C:mult}+#1#{} mult when scored"
+      "{C:mult}+#1# {} Mult when scored"
     }
   },
   config = { extra = {mult = 5}},
@@ -713,7 +713,7 @@ SMODS.Joker {
   cost = 5,
   blueprint_compat = true,
   loc_vars = function(self, info_queue, card)
-    return { vars = { mult = 5 } }
+    return { vars = { card.ability.extra.mult } }
   end,
   calculate = function(self, card, context)
     if context.individual and context.cardarea == G.play then
