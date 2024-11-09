@@ -12,6 +12,8 @@
 -- and my self for the functionality :D
 -- sorry for the code in advance! - mini
 --possible use: G.last_tarrot
+--G.GAME.probabilities[k] = v/2
+
 
 --mod tag icon
 SMODS.Atlas {
@@ -64,7 +66,7 @@ SMODS.Joker {
 --for real
 SMODS.Atlas {
   key = 'jokies',
-  path = 'jokies.png',
+  path = 'NLM_jokies.png',
   px = 71,
   py = 95
 }
@@ -107,8 +109,8 @@ SMODS.Joker {
     name = 'Class Clown',
     text = {
       "Each played {C:attention}6 {}&{C:attention} 9{}",
-      "gives {C:mult}+#1#{} mult and",
-      "{C:chips}+#2#{} chips when scored"
+      "gives {C:mult}+4{} mult and",
+      "{C:chips}+20{} chips when scored"
     }
   },
   config = { extra = { mult = 4, chips = 20 } },
@@ -171,14 +173,14 @@ SMODS.Joker {
   loc_txt = {
     name = 'jumping jacks',
     text = {
-      "gain {C:chips}+15{} chips",
+      "gain {C:chips}+#2#{} chips",
       "when {C:money}jack{} is played",
-      "lose {C:chips}-5{} chips",
+      "lose {C:chips}-#3#{} chips",
       "when any {C:money}non-jack{} is played",
       "{C:inactive}currently: {C:chips}#1#{}{}"
     }
   },
-  config = { extra = {chips = 0, chip_gain = 15, chip_lose = 5}},
+  config = { extra = {chips = 0, chip_gain = 10, chip_lose = 5}},
   rarity = 1,
   atlas = 'jokies',
   pos = { x = 0, y = 6 },
@@ -193,7 +195,8 @@ SMODS.Joker {
     if context.joker_main then
       return {
         chip_mod = card.ability.extra.chips,
-        message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chips } }
+        message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chips } },
+        card = self
       }
     end
     if context.individual and context.cardarea == G.play and not context.blueprint then
@@ -256,12 +259,15 @@ function Card:is_face(from_boss)
   return is_faceRef(self, from_boss)
 end
 
+--fix dementia
+
 SMODS.Joker {
     key = 'biden',
     loc_txt = {
       name = 'Dementia',
       text = {
-        "{C:money}+{}/{C:money}-{} handsize"
+        "{C:money}+{}/{C:money}-{} handsize",
+        "#1#"
       }
     },
     config = { extra = { hand_size = 0 } },
@@ -274,19 +280,16 @@ SMODS.Joker {
       return { vars = { card.ability.extra.hand_size } }
     end,
     calculate = function(self, card, context)
-      if context.end_of_round or context.selling_car then
+
+      if context.setting_blind and not context.blueprint and not context.getting_sliced then
+        card.ability.extra.hand_size = math.random(-3, 6)
+        G.hand:change_size(card.ability.extra.hand_size)
         card.ability.extra.hand_size = 0
-        G.hand:change_size(card.ability.extra.hand_size)
       end
-      if context.setting_blind and not context.blueprint then
-        card.ability.extra.hand_size = math.random(-3, 10)
-        G.hand:change_size(card.ability.extra.hand_size)
-        return{
-          card = card,
-          message = '?'
-        }
-      end
-  end
+  end,
+  remove_from_deck = function(self, card, from_debuff)
+      G.hand:change_size(card.ability.extra.hand_size)
+  end,
 }
 
 SMODS.Joker {
@@ -589,15 +592,8 @@ SMODS.Joker {
     return { vars = { card.ability.extra.Xmult, card.ability.extra.Xmult_gain } }
   end,
   calculate = function(self, card, context)
-    if context.joker_main then
-      return {
-        card:juice_up(),
-        Xmult_mod = card.ability.extra.Xmult,
-        message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } },
-      }
-  end -- needs to kill smth out of the deck on winning hand
-    if context.before and context.cardarea == G.jokers and G.GAME.current_round.discards_left == 0 and not context.blueprint then
-        pseudorandom_element(context.full_hand, pseudoseed('random_destroyIDFK')):start_dissolve()
+      if context.cardarea == G.jokers and context.before and G.GAME.current_round.discards_left == 3 then --and #context.full_hand == 2 then
+        pseudorandom_element(context.full_hand,pseudoseed('random_destroyIDFK')):start_dissolve()
         card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
         return {
           card:juice_up(),
@@ -605,7 +601,13 @@ SMODS.Joker {
           colour = G.C.RED,
         }
     end
-    
+    if context.joker_main then
+      return {
+        card:juice_up(),
+        Xmult_mod = card.ability.extra.Xmult,
+        message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } },
+      }
+  end
 end
 }
 
@@ -712,7 +714,7 @@ SMODS.Joker {
   cost = 5,
   blueprint_compat = true,
   loc_vars = function(self, info_queue, card)
-    return { vars = { chips = 5 } }
+    return { vars = { mult = 5 } }
   end,
   calculate = function(self, card, context)
     if context.individual and context.cardarea == G.play then
