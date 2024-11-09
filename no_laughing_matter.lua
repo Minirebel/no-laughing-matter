@@ -39,7 +39,7 @@ SMODS.Atlas {
 SMODS.Joker {
   key = 'squished',
   loc_txt = {
-    name = 'Squished joker',
+    name = 'Squished Joker',
     text = {
       "{C:mult}+#1# {}Mult"
     }
@@ -171,7 +171,7 @@ SMODS.Joker {
 SMODS.Joker {
   key = 'jumping',
   loc_txt = {
-    name = 'jumping jacks',
+    name = 'Jumping Jacks',
     text = {
       "gain {C:chips}+#2#{} chips",
       "when {C:money}jack{} is played",
@@ -232,7 +232,7 @@ SMODS.Joker {
 SMODS.Joker {
   key = 'faceblind',
   loc_txt = {
-    name = 'face blind',
+    name = 'Faceblind',
     text = {
       "all cards",
       "are considered",
@@ -267,7 +267,6 @@ SMODS.Joker {
       name = 'Dementia',
       text = {
         "{C:money}+{}/{C:money}-{} handsize",
-        "#1#"
       }
     },
     config = { extra = { hand_size = 0 } },
@@ -295,7 +294,7 @@ SMODS.Joker {
 SMODS.Joker {
     key = 'circus',
     loc_txt = {
-      name = 'Ciscus',
+      name = 'Circus',
       text = {
        "{C:mult}+#1# {}Mult"
       }
@@ -423,7 +422,7 @@ SMODS.Joker {
     text = {
       "gives a {C:money}double tag{}",
       "when blind is skipped",
-      "[gives after the skip tag is given]"
+      "{C:inactive}[gives after the skip tag is given]{}"
     }
   },
   rarity = 2,
@@ -573,13 +572,13 @@ end
 SMODS.Joker {
   key = 'silly',
   loc_txt = {
-    name = 'the silly',
+    name = 'The Silly',
     text = {
       "when on 3 discards",
       "a random played card",
       "gets destroyed and",
-      "gain {X:mult}X0.1{}",
-      "{C:inactive}Currently {X:mult}X#1#{C:inactive} XMult"
+      "gain {X:mult}X0.1{} Mult",
+      "{C:inactive}Currently {X:mult}X#1#{C:inactive} Mult"
     }
   },
   config = { extra = { Xmult = 1, Xmult_gain = 0.1 } },
@@ -593,8 +592,8 @@ SMODS.Joker {
   end,
   calculate = function(self, card, context)
       if context.cardarea == G.jokers and context.before and G.GAME.current_round.discards_left == 3 then --and #context.full_hand == 2 then
-        pseudorandom_element(context.full_hand,pseudoseed('random_destroyIDFK')):start_dissolve()
         card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+        pseudorandom_element(context.full_hand,pseudoseed('random_destroyIDFK')):start_dissolve()
         return {
           card:juice_up(),
           message = 'Upgraded!',
@@ -612,9 +611,9 @@ end
 }
 
 SMODS.Joker {
-  key = 'stone_counting',
+  key = 'stone_skipping',
   loc_txt = {
-    name = 'stone skipping',
+    name = 'Stone Skipping',
     text = {
       "{C:money}stone cards{} retrigger as",
       "as many times as the {C:money}amount of{}",
@@ -701,7 +700,7 @@ end
 SMODS.Joker {
   key = 'geode',
   loc_txt = {
-    name = 'crystal geode',
+    name = 'Crystal Geode',
     text = {
       "played {C:money}stone cards{} give",
       "{C:mult}+#1#{} mult when scored"
@@ -720,7 +719,7 @@ SMODS.Joker {
     if context.individual and context.cardarea == G.play then
       if context.other_card.ability.name == "Stone Card" then
           return {
-              chips = card.ability.extra.mult,
+              mult_mod = card.ability.extra.mult,
               card = card
           }
         end
@@ -733,7 +732,7 @@ SMODS.Joker {
 SMODS.Joker {
   key = 'coulro',
   loc_txt = {
-    name = 'coulrophobia',
+    name = 'Coulrophobia',
     text = {
       "depending on the rarity",
       "gain {C:chips}+#1#{}/{C:chips}+#2#{}/{C:chips}+#3#{}/{C:chips}+#4#{}",
