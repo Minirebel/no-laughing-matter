@@ -575,11 +575,11 @@ SMODS.Joker {
   loc_txt = {
     name = 'the silly',
     text = {
-      "when on last discard",
+      "when on 3 discards",
       "a random played card",
       "gets destroyed and",
       "gain {X:mult}X0.1{}",
-      "{C:inactive}(Currently {X:mult}X#1#{C:inactive} XMult)"
+      "{C:inactive}Currently {X:mult}X#1#{C:inactive} XMult"
     }
   },
   config = { extra = { Xmult = 1, Xmult_gain = 0.1 } },
