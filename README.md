@@ -1,6 +1,6 @@
 No Laughing Matter (NLM) adds whatever we think fits. No rules on what it is.
 
-![image](https://github.com/user-attachments/assets/4e308eb5-4456-48e1-aad9-2c5bfb5c15b1)
+![image](https://github.com/user-attachments/assets/dc75ec96-4193-481d-8765-13de8da20abe)
 
 It is a WIP, so there isnt much yet, but we work to add more and more as fast as we can.<br>
 So far there is only 11 Jokers (with few more ready for next update), but there is already 35 planned, and the number is ever growing. Plans also incloude 2 new consumable card packs, and who knows if we come up with other new stuff
