@@ -458,9 +458,6 @@ SMODS.Joker {
   },
   config = {
       extra = {
-          Xmult_min = 0,  -- Minimum value for xmult
-          Xmult_max = 15, -- Maximum value for xmult
-          odds = 10
       }
   },
   loc_vars = function(self, info_queue, card)
@@ -473,10 +470,9 @@ SMODS.Joker {
   blueprint_compat = true,
   calculate = function(self, card, context) 
       if context.joker_main then
-          local Xmult_min = card.ability.extra.Xmult_min
-          local Xmult_max = card.ability.extra.Xmult_max
-          card.ability.extra.Xmult = math.random(Xmult_min, Xmult_max)
-
+          card.ability.extra.Xmult = math.random(0, 15)
+            if SMODS.find_card('j_mini_snake_eyes')[1] then
+              card.ability.extra.Xmult = 0
           return {
               Xmult_mod = card.ability.extra.Xmult,
               message = localize {
@@ -488,6 +484,7 @@ SMODS.Joker {
           }
       end
   end
+end
 }     
 
 SMODS.Joker {
@@ -558,6 +555,7 @@ SMODS.Joker {
       --no code ainst blueprint cuz if all suit is the same then blueprint won't change anything
 }
 
+--maybe do this but for ranks?
 local is_suitRef = Card.is_suit
 function Card:is_suit(suit, bypass_debuff, flush_calc)
     if SMODS.find_card('j_mini_chrome')[1] and (bypass_debuff or not self.debuff) then
@@ -574,7 +572,7 @@ SMODS.Joker {
   loc_txt = {
     name = 'The Silly',
     text = {
-      "when on 3 discards",
+      "when on 2 discards",
       "a random played card",
       "gets destroyed and",
       "gain {X:mult}X0.1{} Mult",
@@ -591,7 +589,7 @@ SMODS.Joker {
     return { vars = { card.ability.extra.Xmult, card.ability.extra.Xmult_gain } }
   end,
   calculate = function(self, card, context)
-      if context.cardarea == G.jokers and context.before and G.GAME.current_round.discards_left == 3 then --and #context.full_hand == 2 then
+      if context.cardarea == G.jokers and context.after and G.GAME.current_round.discards_left == 2 then --and #context.full_hand == 2 then
         card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
         pseudorandom_element(context.full_hand,pseudoseed('random_destroyIDFK')):start_dissolve()
         return {
@@ -707,7 +705,7 @@ SMODS.Joker {
     }
   },
   config = { extra = {mult = 5}},
-  rarity = 3,
+  rarity = 2,
   atlas = 'jokies',
   pos = { x = 1, y = 5 },
   cost = 5,
@@ -838,6 +836,268 @@ local mod = math.floor((G.GAME.dollars + (G.GAME.dollar_buffer or 0)) * (1))
 end
 end
 }
+
+------------
+---testing
+------------
+
+
+
+
+SMODS.Joker {
+  key = 'snake_eyes',
+  loc_txt = {
+    name = 'Snake Eyes',
+    text = {
+      "halves all {C:money}listed{}",
+      "{C:green}probabilities{}",
+      "{C:inactive}[ex:{} {C:green}1in3{} {C:inactive}->{} {C:green}0.5in3{}{C:inactive}]{}"
+    }
+  },
+  config = { extra = { } },
+  rarity = 2,
+  atlas = 'jokies',
+  pos = { x = 0, y = 1 },
+  cost = 4,
+  blueprint_compat = false,
+  add_to_deck = function(self, card, from_debuff)
+    for k, v in pairs(G.GAME.probabilities) do
+      G.GAME.probabilities[k] = v/2
+    end
+  end,
+  remove_from_deck = function(self, card, from_debuff)
+    for k, v in pairs(G.GAME.probabilities) do
+      G.GAME.probabilities[k] = v*2
+    end
+  end
+}
+
+SMODS.Joker {
+  key = 'Lucky_7',
+  loc_txt = {
+    name = 'Lucky 7',
+    text = {
+      "Whenever a {C:attention}7{} scores",
+      "{C:green}+0.5{} to all {C:green}probabilities{}",
+      "resets upon starting a blind",
+      "{C:inactive}[currently:{} {C:green}+#1#{}{C:inactive}]{}",
+    }
+  },
+  config = { extra = { chance = 0, chance_gain = 0.5 } },
+  rarity = 3,
+  atlas = 'jokies',
+  pos = { x = 3, y = 3 },
+  cost = 5,
+  blueprint_compat = false,
+  loc_vars = function(self, info_queue, card)
+    return { vars = { card.ability.extra.chance, card.ability.extra.chance_gain } }
+  end,
+  calculate = function(self, card, context)
+    if context.individual and context.cardarea == G.play and not context.blueprint then
+      if context.other_card:get_id() == 7 then
+      card.ability.extra.chance = card.ability.extra.chance + card.ability.extra.chance_gain
+      if not context.blueprint then
+        for k, v in pairs(G.GAME.probabilities) do
+          G.GAME.probabilities[k] = v + card.ability.extra.chance_gain
+        end
+      end
+        return {
+          card:juice_up()
+        }
+      end
+    end
+  if context.setting_blind and not context.blueprint then --makes sure it only triggers once
+        for k, v in pairs(G.GAME.probabilities) do
+          G.GAME.probabilities[k] = v - card.ability.extra.chance
+        end
+          card.ability.extra.chance = 0
+      end
+end,
+remove_from_deck = function(self, card, from_debuff)
+  for k, v in pairs(G.GAME.probabilities) do
+    G.GAME.probabilities[k] = v - card.ability.extra.chance
+  end
+end
+}
+
+SMODS.Joker {
+  key = 'Cartology',
+  loc_txt = {
+    name = 'Cartology',
+    text = {
+      "All {C:purple}Tarot{} cards and",
+      "{C:purple}Arcana Packs{} in",
+      "the shop are {C:money}free{}",
+    }
+  },
+  config = { extra = { } },
+  rarity = 2,
+  atlas = 'jokies',
+  pos = { x = 3, y = 0 },
+  cost = 4,
+  blueprint_compat = false,
+
+  add_to_deck = function(from_debuff)
+  G.E_MANAGER:add_event(Event({func = function()
+    for k, v in pairs(G.I.CARD) do
+        if v.set_cost then v:set_cost() end
+    end
+    return true end }))
+  end,
+  remove_from_deck = function(from_debuff)
+    G.E_MANAGER:add_event(Event({func = function()
+      for k, v in pairs(G.I.CARD) do
+          if v.set_cost then v:set_cost() end
+      end
+      return true end }))
+    end,
+}
+
+SMODS.Joker {
+  key = 'Blessing',
+  loc_txt = {
+    name = 'Blessing',
+    text = {
+      "all {C:blue}Spectral{} cards and",
+      "{C:blue}Spectral Packs{} in",
+      "the shop are {C:money}free{}",
+    }
+  },
+  config = { extra = { } },
+  rarity = 3,
+  atlas = 'jokies',
+  pos = { x = 4, y = 3 },
+  cost = 4,
+  blueprint_compat = false,
+  add_to_deck = function(from_debuff)
+  G.E_MANAGER:add_event(Event({func = function()
+    for k, v in pairs(G.I.CARD) do
+        if v.set_cost then v:set_cost() end
+    end
+    return true end }))
+  end,
+  remove_from_deck = function(from_debuff)
+    G.E_MANAGER:add_event(Event({func = function()
+      for k, v in pairs(G.I.CARD) do
+          if v.set_cost then v:set_cost() end
+      end
+      return true end }))
+    end,
+}
+--make one for normal cards
+--card:set_cost()
+local set_mini_cost = Card.set_cost
+function Card:set_cost()
+  set_mini_cost(self)
+  if (self.ability.set == 'Tarot' or (self.ability.set == 'Booster' and self.ability.name:find('Arcana'))) and SMODS.find_card('j_mini_Cartology')[1] then
+    self.cost = 0
+  end
+  if (self.ability.set == 'Spectral' or (self.ability.set == 'Booster' and self.ability.name:find('Spectral'))) and SMODS.find_card('j_mini_Blessing')[1] then
+    self.cost = 0
+  end
+end
+--[[
+SMODS.Joker {
+  key = 'fake_obelisk',
+  loc_txt = {
+    name = 'fake_obelisk',
+    text = {
+      "#1# #2#"
+    }
+  },
+  config = { extra = { Xmult = 1, Xmult_gain = 0.2 } },
+  rarity = 3,
+  atlas = 'jokies',
+  pos = { x = 4, y = 3 },
+  cost = 4,
+  loc_vars = function(self, info_queue, card)
+    return { vars = { card.ability.extra.Xmult, card.ability.extra.Xmult_gain } }
+  end,
+  blueprint_compat = true,
+  calculate = function(self, card, context)
+    if context.joker_main then
+      return {
+        message = 'hi',
+        Xmult_mod = card.ability.extra.Xmult,
+        card = card
+      }
+    end
+    if context.before and not context.blueprint then
+      local play_more_than = (G.GAME.hands[context.scoring_name].played or 0)
+      for k, v in pairs(G.GAME.hands) do
+          if k ~= context.scoring_name and v.played >= play_more_than and v.visible then
+            sendMessageToConsole("DEBUG", logger, message == context.scoring_name)
+            --card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+          end
+        end
+end
+end
+}
+
+--brainstorm
+--[[
+  calculate = function(self, card, context)
+    if context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self then
+  if context.other_card == G.jokers.cards[-1] then
+    return {
+      message = localize('k_again_ex'),
+      repetitions = card.ability.extra.retriggers,
+      card = card
+    }
+  else return {calculated = true} end
+    end
+end
+--]]
+
+
+
+            
+
+--stones update:
+--[[
+SMODS.Joker {
+  key = 'sandstone',
+  loc_txt = {
+    name = 'sandstone',
+    text = {
+      "#5# in #2# for X2 mult",
+      "#5# in #4# for $10",
+      "#1#, #2#, #3#, #4#, #5#"
+    }
+  },
+  config = { extra = { Xmult = 2, odds_Xmult = 3, money = 10, odds_money = 10 } },
+  rarity = 1,
+  atlas = 'jokies',
+  pos = { x = 3, y = 1 },
+  cost = 4,
+  blueprint_compat = false,
+  loc_vars = function(self, info_queue, card)
+    return { vars = { card.ability.extra.Xmult, card.ability.extra.odds_Xmult, card.ability.extra.money, card.ability.extra.odds_money, (''..(G.GAME and G.GAME.probabilities.normal or 1)) } }
+  end,
+  calculate = function(self, card, context)
+  if context.individual and context.cardarea == G.play and not context.repetitions then
+    if context.other_card.ability.name == "Lucky Card" then
+
+      local give_money = pseudorandom('sandstone') < G.GAME.probabilities.normal / card.ability.extra.odds_money
+      local give_Xmult = pseudorandom('sandstone') < G.GAME.probabilities.normal / card.ability.extra.odds_Xmult
+    
+      local result = { card = card }
+
+        if give_money then
+          result.dollars = card.ability.extra.money
+        end
+        if give_Xmult then
+          result.x_mult = card.ability.extra.Xmult
+        end
+    return result
+    end
+  end
+end
+}
+--]]
+
+
+
 
 --next joker i want to be done (make stone still have suit and rank)
 --[[
