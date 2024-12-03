@@ -66,7 +66,7 @@ SMODS.Joker {
 --for real
 SMODS.Atlas {
   key = 'jokies',
-  path = 'NLM_jokies.png',
+  path = 'jokies.png',
   px = 71,
   py = 95
 }
@@ -695,37 +695,6 @@ end
 }
 --]]
 
-SMODS.Joker {
-  key = 'geode',
-  loc_txt = {
-    name = 'Crystal Geode',
-    text = {
-      "played {C:money}stone cards{} give",
-      "{C:mult}+#1#{} Mult when scored"
-    }
-  },
-  config = { extra = {mult = 5}},
-  rarity = 2,
-  atlas = 'jokies',
-  pos = { x = 1, y = 5 },
-  cost = 5,
-  blueprint_compat = true,
-  loc_vars = function(self, info_queue, card)
-    return { vars = { card.ability.extra.mult } }
-  end,
-  calculate = function(self, card, context)
-    if context.individual and context.cardarea == G.play then
-      if context.other_card.ability.name == "Stone Card" then
-          return {
-              mult_mod = card.ability.extra.mult,
-              card = card
-          }
-        end
-    end
-  end
-}
-
-
 --legendary needs 2x Xchips!
 SMODS.Joker {
   key = 'coulro',
@@ -886,7 +855,7 @@ SMODS.Joker {
   config = { extra = { chance = 0, chance_gain = 0.5 } },
   rarity = 3,
   atlas = 'jokies',
-  pos = { x = 3, y = 3 },
+  pos = { x = 0, y = 7 },
   cost = 5,
   blueprint_compat = false,
   loc_vars = function(self, info_queue, card)
@@ -996,65 +965,201 @@ function Card:set_cost()
     self.cost = 0
   end
 end
---[[
+
 SMODS.Joker {
-  key = 'fake_obelisk',
+  key = 'monolith',
   loc_txt = {
-    name = 'fake_obelisk',
+    name = 'Monolith',
     text = {
-      "#1# #2#"
+      "This joker gains {X:mult}X#2#{} mult",
+      "per {C:attention}consecutive{} hand played",
+      "playing only your",
+      "most played {C:attention}poker hand{}",
+      "{C:inactive}[Currently:{} {X:mult, C:inactive}X#1#{} {C:inactive}mult]{}"
     }
   },
   config = { extra = { Xmult = 1, Xmult_gain = 0.2 } },
   rarity = 3,
-  atlas = 'jokies',
-  pos = { x = 4, y = 3 },
   cost = 4,
+  atlas = 'jokies',
+  pos = { x = 1, y = 1 },
   loc_vars = function(self, info_queue, card)
     return { vars = { card.ability.extra.Xmult, card.ability.extra.Xmult_gain } }
   end,
   blueprint_compat = true,
   calculate = function(self, card, context)
-    if context.joker_main then
-      return {
-        message = 'hi',
-        Xmult_mod = card.ability.extra.Xmult,
-        card = card
-      }
-    end
-    if context.before and not context.blueprint then
-      local play_more_than = (G.GAME.hands[context.scoring_name].played or 0)
-      for k, v in pairs(G.GAME.hands) do
-          if k ~= context.scoring_name and v.played >= play_more_than and v.visible then
-            sendMessageToConsole("DEBUG", logger, message == context.scoring_name)
-            --card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
-          end
-        end
-end
+		if context.before and not context.blueprint then
+			local reset = false
+			local play_more_than = (G.GAME.hands[context.scoring_name].played or 0)
+			for k, v in pairs(G.GAME.hands) do
+				if k ~= context.scoring_name and v.played >= play_more_than and v.visible then
+					reset = true
+        else
+          most_played = true
+				end
+			end
+			if reset then
+					card.ability.extra.Xmult = 1
+					return {
+						card = card,
+						message = localize("k_reset"),
+					}
+				end
+			if most_played then
+				card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+				return {
+          card = card,
+          Xmult_mod = card.ability.extra.Xmult,
+          message = localize("k_upgraded"),
+        }
+			end
+	end
 end
 }
 
---brainstorm
---[[
-  calculate = function(self, card, context)
-    if context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self then
-  if context.other_card == G.jokers.cards[-1] then
-    return {
-      message = localize('k_again_ex'),
-      repetitions = card.ability.extra.retriggers,
-      card = card
+SMODS.Joker {
+  key = 'Green_Needle',
+  loc_txt = {
+    name = 'Green needle',
+    text = {
+      "retriggers the rightmost {C:attention}joker{}"
     }
-  else return {calculated = true} end
-    end
+  },
+  config = { extra = { retriggers = 1 } },
+  rarity = 3,
+  cost = 8,
+  atlas = 'jokies',
+  pos = { x = 5, y = 0 },
+  blueprint_compat = false,
+  calculate = function(self, card, context)
+    if not context.blueprint then
+		if context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self then
+			if context.other_card == G.jokers.cards[#G.jokers.cards] then
+				return {
+					message = localize("k_again_ex"),
+					repetitions = card.ability.extra.retriggers,
+					card = card,
+				}
+			else
+				return nil, true
+			end
+		end
+	end
 end
+}
+
+SMODS.Joker {
+  key = 'schematic',
+  loc_txt = {
+    name = 'schematic',
+    text = {
+      "retriggers the {C:attention}joker{}",
+      "on the left"
+    }
+  },
+  config = { extra = { retriggers = 1 } },
+  rarity = 3,
+  atlas = 'jokies',
+  pos = { x = 6, y = 0 },
+  cost = 4,
+  blueprint_compat = false,
+  calculate = function(self, card, context)
+    if not context.blueprint then
+    local Joker_left = nil
+    for i = 1, #G.jokers.cards do
+      if G.jokers.cards[i] == card then
+        Joker_left = i
+        break
+      end
+    end
+		if context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self then
+			if context.other_card == G.jokers.cards[Joker_left-1] then
+				return {
+					message = localize("k_again_ex"),
+					repetitions = card.ability.extra.retriggers,
+					card = card,
+				}
+			else
+				return nil, true
+			end
+		end
+  end
+end
+}
+
+--still needs texture and name
+--[[
+SMODS.Joker {
+  key = 'Blessing3',
+  loc_txt = {
+    name = 'full right one retriggers',
+    text = {
+      "all {C:attention}jokers{}",
+      "retrigger once"
+    }
+  },
+  config = { extra = { retriggers = 1 } },
+  rarity = 4,
+  cost = 10,
+  atlas = 'jokies',
+  pos = { x = 0, y = 0 },
+  soul_pos = { x = 0, y = 0 },
+  blueprint_compat = false,
+  calculate = function(self, card, context)
+    if not context.blueprint then
+		if context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self then
+			if context.other_card ~= G.jokers.cards[i] then
+				return {
+					message = localize("k_again_ex"),
+					repetitions = card.ability.extra.retriggers,
+					card = card,
+				}
+			else
+				return nil, true
+			end
+		end
+  end
+end
+}
 --]]
 
 
 
-            
+
 
 --stones update:
 --[[
+
+SMODS.Joker {
+  key = 'geode',
+  loc_txt = {
+    name = 'Crystal Geode',
+    text = {
+      "played {C:money}stone cards{} give",
+      "{C:mult}+#1#{} Mult when scored"
+    }
+  },
+  config = { extra = {mult = 5}},
+  rarity = 2,
+  atlas = 'jokies',
+  pos = { x = 1, y = 5 },
+  cost = 5,
+  blueprint_compat = true,
+  loc_vars = function(self, info_queue, card)
+    return { vars = { card.ability.extra.mult } }
+  end,
+  calculate = function(self, card, context)
+    if context.individual and context.cardarea == G.play then
+      if context.other_card.ability.name == "Stone Card" then
+          return {
+              mult_mod = card.ability.extra.mult,
+              card = card
+          }
+        end
+    end
+  end
+}
+
 SMODS.Joker {
   key = 'sandstone',
   loc_txt = {
