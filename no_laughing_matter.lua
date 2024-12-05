@@ -473,6 +473,7 @@ SMODS.Joker {
           card.ability.extra.Xmult = math.random(0, 15)
             if SMODS.find_card('j_mini_snake_eyes')[1] then
               card.ability.extra.Xmult = 0
+            end
           return {
               Xmult_mod = card.ability.extra.Xmult,
               message = localize {
@@ -483,7 +484,6 @@ SMODS.Joker {
               }
           }
       end
-  end
 end
 }     
 
