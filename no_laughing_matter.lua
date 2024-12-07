@@ -793,17 +793,10 @@ SMODS.Joker {
   soul_pos = { x = 3, y = 6 },
   cost = 5,
   blueprint_compat = false,
-  calculate = function(self, card, context)
-    if G.GAME.round_resets.blind_states == 'Defeated' and not context.blueprint then
-local mod = math.floor((G.GAME.dollars + (G.GAME.dollar_buffer or 0)) * (1))
-        ease_dollars(mod)
-  return {
-    card:juice_up(),
-    message = 'big shot!',
-    colour = G.C.MULT,
-  }
-end
-end
+  calc_dollar_bonus = function(self, card)
+    local bonus = (G.GAME.dollars + (G.GAME.dollar_buffer or 0))*2
+    if bonus > 0 then return bonus end
+  end
 }
 
 ------------
