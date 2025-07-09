@@ -189,9 +189,7 @@ SMODS.Joker {
   blueprint_compat = true,
   loc_vars = function(self, info_queue, card)
     return { vars = { card.ability.extra.chips, card.ability.extra.chip_gain, card.ability.extra.chip_lose} }
-  end,
- 
-  calculate = function(self, card, context)
+  end,   calculate = function(self, card, context)
     if context.joker_main then
       return {
         chip_mod = card.ability.extra.chips,
@@ -201,28 +199,67 @@ SMODS.Joker {
     end
     if context.individual and context.cardarea == G.play and not context.blueprint then
       if context.other_card:get_id() == 11 then
-      card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_gain
-      return {
-        message = 'Upgraded!',
-        colour = G.C.CHIPS,
-        card = self
-      }
-    end
-    if context.individual and context.cardarea == G.play and not context.blueprint then
-        if context.other_card:get_id() ~= 11 then
-          card.ability.extra.chips = card.ability.extra.chips - card.ability.extra.chip_lose
-          if card.ability.extra.chips <= 0 then
-            card.ability.extra.chips = 0
+        -- Handle both regular numbers and Talisman's omeganum format for addition
+        if type(card.ability.extra.chips) == "table" and card.ability.extra.chips.sign then
+          -- For Talisman format, we need to use their addition method if available
+          -- This assumes Talisman provides a way to add numbers to their format
+          -- You may need to adjust this based on Talisman's actual API
+          if G.OMEGANUMBER and G.OMEGANUMBER.add then
+            card.ability.extra.chips = G.OMEGANUMBER.add(card.ability.extra.chips, card.ability.extra.chip_gain)
+          end
+        else
+          -- Regular number addition
+          card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_gain
         end
         return {
-          message = 'Degraded!',
+          message = 'Upgraded!',
           colour = G.C.CHIPS,
           card = self
         }
       end
     end
-  end
-  end
+    if context.individual and context.cardarea == G.play and not context.blueprint then
+        if context.other_card:get_id() ~= 11 then
+          -- Handle both regular numbers and Talisman's omeganum format for subtraction
+          if type(card.ability.extra.chips) == "table" and card.ability.extra.chips.sign then
+            -- For Talisman format, we need to use their subtraction method if available
+            if G.OMEGANUMBER and G.OMEGANUMBER.subtract then
+              card.ability.extra.chips = G.OMEGANUMBER.subtract(card.ability.extra.chips, card.ability.extra.chip_lose)
+            end
+          else
+            -- Regular number subtraction
+            card.ability.extra.chips = card.ability.extra.chips - card.ability.extra.chip_lose
+          end
+          
+          -- Check if chips are less than or equal to zero
+          local is_zero_or_negative = false
+          if type(card.ability.extra.chips) == "table" and card.ability.extra.chips.sign then
+            -- For Talisman format, check sign
+            if card.ability.extra.chips.sign <= 0 then
+              is_zero_or_negative = true
+            end
+          elseif type(card.ability.extra.chips) == "number" and card.ability.extra.chips <= 0 then
+            -- For regular numbers
+            is_zero_or_negative = true
+          end
+          
+          if is_zero_or_negative then
+            -- Set to zero (either regular 0 or Talisman's representation of 0)
+            if G.OMEGANUMBER and G.OMEGANUMBER.fromNumber then
+              card.ability.extra.chips = G.OMEGANUMBER.fromNumber(0)
+            else
+              card.ability.extra.chips = 0
+            end
+          end
+          
+          return {
+            message = 'Degraded!',
+            colour = G.C.CHIPS,
+            card = self
+          }
+        end
+      end
+    end
 }
 
 ------------------
@@ -336,8 +373,33 @@ SMODS.Joker {
   cost = 5,
   blueprint_compat = true,
   calculate = function(self, card, context)
-    if context.setting_blind and not card.getting_sliced and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
-      G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+    local total_cards = #G.consumeables.cards
+    local card_limit = G.consumeables.config.card_limit
+    local has_room = false
+    
+    -- Handle the comparison with Talisman's number format
+    if type(G.GAME.consumeable_buffer) == "table" and G.GAME.consumeable_buffer.sign then
+      -- For Talisman format, use their comparison methods if available
+      if G.OMEGANUMBER and G.OMEGANUMBER.add and G.OMEGANUMBER.compare then
+        local total = G.OMEGANUMBER.fromNumber(total_cards)
+        total = G.OMEGANUMBER.add(total, G.GAME.consumeable_buffer)
+        has_room = G.OMEGANUMBER.compare(total, card_limit) < 0
+      end
+    else
+      -- Regular number comparison
+      has_room = (total_cards + G.GAME.consumeable_buffer < card_limit)
+    end
+    
+    if context.setting_blind and not card.getting_sliced and has_room then
+      -- Handle incrementing the buffer with Talisman's number format
+      if type(G.GAME.consumeable_buffer) == "table" and G.GAME.consumeable_buffer.sign then
+        if G.OMEGANUMBER and G.OMEGANUMBER.add then
+          G.GAME.consumeable_buffer = G.OMEGANUMBER.add(G.GAME.consumeable_buffer, 1)
+        end
+      else
+        G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+      end
+      
       G.E_MANAGER:add_event(Event({
           func = (function()
               G.E_MANAGER:add_event(Event({
@@ -345,7 +407,14 @@ SMODS.Joker {
                       local card = create_card('Planet',G.consumeables, nil, nil, nil, nil, nil, 'car')
                       card:add_to_deck()
                       G.consumeables:emplace(card)
-                      G.GAME.consumeable_buffer = 0
+                      
+                      -- Handle setting buffer to zero with Talisman's number format
+                      if G.OMEGANUMBER and G.OMEGANUMBER.fromNumber then
+                        G.GAME.consumeable_buffer = G.OMEGANUMBER.fromNumber(0)
+                      else
+                        G.GAME.consumeable_buffer = 0
+                      end
+                      
                       return true
                   end}))   
                   card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = localize('k_plus_planet'), colour = G.C.PURPLE})                       
@@ -378,7 +447,14 @@ SMODS.Joker {
   end,
   calc_dollar_bonus = function(self, card)
     local bonus = card.ability.extra.money
-    if bonus > 0 then return bonus end
+    -- Handle both regular numbers and Talisman's omeganum format
+    if type(bonus) == "table" and bonus.sign then
+      -- For Talisman's omeganum format, check if it's positive using the sign property
+      if bonus.sign > 0 then return bonus end
+    elseif type(bonus) == "number" and bonus > 0 then
+      -- For regular numbers, do the normal comparison
+      return bonus
+    end
   end
 }
      
@@ -404,14 +480,20 @@ SMODS.Joker {
   blueprint_compat = true,
   loc_vars = function(self, info_queue, card)
     return { vars = { card.ability.extra.money } }
-  end,
-  calc_dollar_bonus = function(self, card)
+  end,  calc_dollar_bonus = function(self, card)
     local money_min = card.ability.extra.money_min
     local money_max = card.ability.extra.money_max
     card.ability.extra.money = math.random(money_min, money_max)
     
     local bonus = card.ability.extra.money
-    if bonus > 0 then return bonus end
+    -- Handle both regular numbers and Talisman's omeganum format
+    if type(bonus) == "table" and bonus.sign then
+      -- For Talisman's omeganum format, check if it's positive using the sign property
+      if bonus.sign > 0 then return bonus end
+    elseif type(bonus) == "number" and bonus > 0 then
+      -- For regular numbers, do the normal comparison
+      return bonus
+    end
 end
 }   
 
@@ -503,8 +585,33 @@ SMODS.Joker {
   cost = 6,
   blueprint_compat = true,
   calculate = function(self, card, context)
-    if context.setting_blind and not card.getting_sliced and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
-      G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+    local total_cards = #G.consumeables.cards
+    local card_limit = G.consumeables.config.card_limit
+    local has_room = false
+    
+    -- Handle the comparison with Talisman's number format
+    if type(G.GAME.consumeable_buffer) == "table" and G.GAME.consumeable_buffer.sign then
+      -- For Talisman format, use their comparison methods if available
+      if G.OMEGANUMBER and G.OMEGANUMBER.add and G.OMEGANUMBER.compare then
+        local total = G.OMEGANUMBER.fromNumber(total_cards)
+        total = G.OMEGANUMBER.add(total, G.GAME.consumeable_buffer)
+        has_room = G.OMEGANUMBER.compare(total, card_limit) < 0
+      end
+    else
+      -- Regular number comparison
+      has_room = (total_cards + G.GAME.consumeable_buffer < card_limit)
+    end
+    
+    if context.setting_blind and not card.getting_sliced and has_room then
+      -- Handle incrementing the buffer with Talisman's number format
+      if type(G.GAME.consumeable_buffer) == "table" and G.GAME.consumeable_buffer.sign then
+        if G.OMEGANUMBER and G.OMEGANUMBER.add then
+          G.GAME.consumeable_buffer = G.OMEGANUMBER.add(G.GAME.consumeable_buffer, 1)
+        end
+      else
+        G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+      end
+      
       G.E_MANAGER:add_event(Event({
           func = (function()
               G.E_MANAGER:add_event(Event({
@@ -512,7 +619,14 @@ SMODS.Joker {
                       local card = create_card('Spectral',G.consumeables, nil, nil, nil, nil, nil, 'car')
                       card:add_to_deck()
                       G.consumeables:emplace(card)
-                      G.GAME.consumeable_buffer = 0
+                      
+                      -- Handle setting buffer to zero with Talisman's number format
+                      if G.OMEGANUMBER and G.OMEGANUMBER.fromNumber then
+                        G.GAME.consumeable_buffer = G.OMEGANUMBER.fromNumber(0)
+                      else
+                        G.GAME.consumeable_buffer = 0
+                      end
+                      
                       return true
                   end}))   
                   card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = localize('k_plus_spectral'), colour = G.C.PURPLE})                       
@@ -795,7 +909,14 @@ SMODS.Joker {
   blueprint_compat = false,
   calc_dollar_bonus = function(self, card)
     local bonus = (G.GAME.dollars + (G.GAME.dollar_buffer or 0))*2
-    if bonus > 0 then return bonus end
+    -- Handle both regular numbers and Talisman's omeganum format
+    if type(bonus) == "table" and bonus.sign then
+      -- For Talisman's omeganum format, check if it's positive using the sign property
+      if bonus.sign > 0 then return bonus end
+    elseif type(bonus) == "number" and bonus > 0 then
+      -- For regular numbers, do the normal comparison
+      return bonus
+    end
   end
 }
 
